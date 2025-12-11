@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretzelized Promotion Performance Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .header .note {
+            font-size: 13px;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .key-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 35px;
+            border-radius: 10px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            transform: translate(40%, -40%);
+        }
+        
+        .metric-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-size: 56px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-context {
+            font-size: 15px;
+            opacity: 0.95;
+        }
+        
+        .comparison-section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .product-comparison {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .product-comparison:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .product-comparison.winner {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+        
+        .product-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .product-comparison.winner .product-name::after {
+            content: ' ✓';
+            color: #4CAF50;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        
+        .breakdown-section {
+            background: #fafafa;
+            padding: 35px;
+            border-radius: 10px;
+            border-left: 5px solid #f5576c;
+        }
+        
+        .breakdown-title {
+            font-size: 20px;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .funnel-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .funnel-bar-container {
+            flex: 1;
+            background: #e0e0e0;
+            height: 50px;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .funnel-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+        
+        .funnel-bar.low {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .funnel-label {
+            width: 280px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .funnel-value {
+            width: 100px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .insight-box {
+            margin-top: 35px;
+            padding: 25px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .insight-box h3 {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .insight-box p {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Pretzelized Promotion Performance Analysis</h1>
+            <div class="subtitle">Promotion Period: October 27 - November 3, 2024 | Analysis Period: Pre (9/15-10/13) vs Post (11/10-12/08)</div>
+            <div class="note">Data limited to app and web channel orders only</div>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 35px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #667eea;">
+            <h2 style="font-size: 24px; color: #1a1a1a; margin-bottom: 20px; font-weight: 600;">Key Takeaways</h2>
+            <div style="display: grid; gap: 20px;">
+                <div style="display: flex; gap: 15px;">
+                    <div style="color: #667eea; font-weight: bold; font-size: 18px; min-width: 30px;">1.</div>
+                    <p style="font-size: 16px; color: #333; line-height: 1.6; margin: 0;">
+                        Orders containing pretzelized items increased by only <strong>2%</strong> post-promotion among users who participated in the drop. This represents a significant performance gap compared to La Croix, which achieved a <strong>5%</strong> increase in orders containing the promoted item—suggesting this promotion was less effective at converting trial users into paying customers.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div style="color: #667eea; font-weight: bold; font-size: 18px; min-width: 30px;">2.</div>
+                    <p style="font-size: 16px; color: #333; line-height: 1.6; margin: 0;">
+                        Of existing customers who redeemed the pretzelized promotion, only <strong>7.4%</strong> went on to purchase the product in the post-drop period. This conversion rate is 39% lower than La Croix's <strong>12.14%</strong>, further indicating underperformance relative to previous promotional campaigns.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="key-metrics">
+            <div class="metric-card warning">
+                <div class="metric-label">Overall Post-Drop Repeat Rate</div>
+                <div class="metric-value">2%</div>
+                <div class="metric-context">of all orders included pretzelized items post-promotion</div>
+            </div>
+            
+            <div class="metric-card warning">
+                <div class="metric-label">Existing Customer Conversion</div>
+                <div class="metric-value">7.4%</div>
+                <div class="metric-context">of existing customers who redeemed purchased pretzelized again</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 60px; margin-bottom: 30px; text-align: center;">
+            <h2 style="font-size: 28px; color: #1a1a1a; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; border-top: 3px solid #e0e0e0; padding-top: 30px;">Additional Details</h2>
+        </div>
+        
+        <div class="breakdown-section">
+            <h2 class="section-title">Drop Breakdown: Existing Customers</h2>
+            <div class="breakdown-title">Customer Behavior Funnel (Accounts Before 1/1/25)</div>
+            
+            <div class="funnel-container">
+                <div class="funnel-step">
+                    <div class="funnel-label">Redeemed pretzelized promotion</div>
+                    <div class="funnel-bar-container">
+                        <div class="funnel-bar" style="width: 100%;">1,598 users</div>
+                    </div>
+                    <div class="funnel-value">100%</div>
+                </div>
+                
+                <div class="funnel-step">
+                    <div class="funnel-label">Had never ordered pretzelized before</div>
+                    <div class="funnel-bar-container">
+                        <div class="funnel-bar" style="width: 79.8%;">1,275 users</div>
+                    </div>
+                    <div class="funnel-value">79.8%</div>
+                </div>
+                
+                <div class="funnel-step">
+                    <div class="funnel-label">Had ordered pretzelized before</div>
+                    <div class="funnel-bar-container">
+                        <div class="funnel-bar" style="width: 16.5%;">263 users</div>
+                    </div>
+                    <div class="funnel-value">16.5%</div>
+                </div>
+                
+                <div class="funnel-step">
+                    <div class="funnel-label">→ Purchased pretzelized post-drop</div>
+                    <div class="funnel-bar-container">
+                        <div class="funnel-bar low" style="width: 7.38%;">118 users</div>
+                    </div>
+                    <div class="funnel-value">7.4%</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="comparison-section" style="margin-top: 50px;">
+            <h2 class="section-title">Product Promotion Comparison: Existing Customers</h2>
+            <div class="comparison-grid">
+                <div class="product-comparison winner">
+                    <div class="product-name">La Croix</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Customers who redeemed</span>
+                        <span class="stat-value">1,615</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Purchased post-promotion</span>
+                        <span class="stat-value">196 (12.14%)</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Of those who had ordered before</span>
+                        <span class="stat-value">99/267 (37.08%)</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Overall Post-Drop Repeat Rate</span>
+                        <span class="stat-value">5%</span>
+                    </div>
+                </div>
+                
+                <div class="product-comparison">
+                    <div class="product-name">Pretzelized</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Customers who redeemed</span>
+                        <span class="stat-value">1,598</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Purchased post-promotion</span>
+                        <span class="stat-value">118 (7.38%)</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Of those who had ordered before</span>
+                        <span class="stat-value">57/263 (21.67%)</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Overall Post-Drop Repeat Rate</span>
+                        <span class="stat-value">2%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insight-box">
+                <h3>Key Insight</h3>
+                <p>Only 7.4% of existing customers who redeemed the pretzelized promotion went on to purchase the product post-drop. This 64% performance gap compared to La Croix (12.14% vs 7.38%) suggests the promotion did not successfully convert trial users into paying customers for this product.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
