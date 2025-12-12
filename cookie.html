@@ -19,23 +19,24 @@
         
         /* Navigation Styles */
         .nav-container {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        padding-bottom: 0; /* Remove bottom padding */
         }
         
         .nav-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 50px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0; /* Remove default padding */
         }
-        
+
+        /* Add spacing between header and tabs */
         .nav-tabs {
-            display: flex;
-            gap: 0;
-            list-style: none;
+        margin-top: 0;
+        padding: 0 50px;
         }
         
         .nav-tab {
