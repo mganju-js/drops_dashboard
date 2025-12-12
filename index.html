@@ -19,24 +19,23 @@
         
         /* Navigation Styles */
         .nav-container {
-        background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        padding-bottom: 0; /* Remove bottom padding */
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         
         .nav-wrapper {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0; /* Remove default padding */
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 50px;
         }
-
-        /* Add spacing between header and tabs */
+        
         .nav-tabs {
-        margin-top: 0;
-        padding: 0 50px;
+            display: flex;
+            gap: 0;
+            list-style: none;
         }
         
         .nav-tab {
@@ -318,16 +317,9 @@
     <!-- Navigation -->
     <nav class="nav-container">
         <div class="nav-wrapper">
-            <!-- Just Salad Header -->
-            <div style="background: linear-gradient(135deg, #5B9FF5 0%, #7BB4FF 100%); padding: 25px 50px; margin-bottom: 0;">
-                <h1 style="color: #2C3E7D; font-size: 28px; font-weight: 700; margin: 0; letter-spacing: 1px; text-align: center; text-transform: uppercase;">
-                    Just Salad Loyalty Drops Analysis
-                </h1>
-            </div>
-        
             <!-- Tab Navigation -->
-            <ul class="nav-tabs" style="padding: 0 50px; margin: 0;">
-            <!-- <ul class="nav-tabs"> -->
+            <!-- <ul class="nav-tabs" style="padding: 0 50px; margin: 0;"> -->
+            <ul class="nav-tabs">
                 <li class="nav-tab">
                     <a href="cookie.html">Cookie</a>
                 </li>
